@@ -1,0 +1,73 @@
+base_url = "https://www.rybarski.com"
+title = "Jim Rybarski"
+generate_feeds = true
+author = "Jim Rybarski"
+
+# Whether to automatically compile all Sass files in the sass directory
+compile_sass = true
+feed_filenames = ["atom.xml", ]
+
+
+# Whether to build a search index to be used later on by a JavaScript library
+build_search_index = true
+
+theme = "papermod"
+taxonomies = [{name = "tags"}]
+generate_sitemap = true
+default_language = "en"
+
+[search]
+# Whether to include the title of the page/section in the index
+include_title = true
+# Whether to include the description of the page/section in the index
+include_description = false
+# Whether to include the path of the page/section in the index
+include_path = false
+# Whether to include the rendered content of the page/section in the index
+include_content = true
+# At which character to truncate the content to. Useful if you have a lot of pages and the index would
+# become too big to load on the site. Defaults to not being set.
+# truncate_content_length = 100
+# Wether to produce the search index as a javascript file or as a JSON file
+# Accepted value "elasticlunr_javascript" or "elasticlunr_json"
+index_format = "elasticlunr_json"
+
+
+[markdown]
+highlight_code = true
+
+
+[extra]
+author = "Jim Rybarski"
+
+[extra.papermod]
+title = "Jim Rybarski"
+default_theme = "light"
+theme = "light"
+language_direction = "auto"
+keywords = []
+show_toc = false
+show_theme_toggle = false
+show_scroll_to_top = true
+show_code_copy_buttons = true
+show_reading_time = false
+show_word_count = false
+show_post_nav_links = true
+show_post_meta = true
+default_toc_open = false
+show_post_edit_button = false
+copyright = "© 2025 Jim Rybarski"
+date_format = "%Y-%m-%d"
+navigation = [
+    { url = "$BASE_URL/about", title = "About" },
+    { url = "$BASE_URL/tags", title = "Tags" },
+    { url = "$BASE_URL/atom.xml", title = "RSS" },
+    { url = "$BASE_URL/search", title = "Search" },
+]
+home_title = "Jim Rybarski"
+home_content = ""
+social_icons = [
+    { url = "https://github.com/jimrybarski", title = "GitHub", icon = "github" },
+    { url = "$BASE_URL/atom.xml", title = "RSS", icon = "rss" },
+]
+
