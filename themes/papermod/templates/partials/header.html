@@ -1,0 +1,46 @@
+{% if config.extra.papermod.default_theme == "light" %}
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    }
+</script>
+{% elif config.extra.papermod.default_theme == "dark" %}
+<script>
+    if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    }
+</script>
+{% else %}
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+</script>
+{% endif %}
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="{{ config.base_url }}" accesskey="h" title="{{ config.extra.papermod.title }} (Alt + H)">
+                {%- if config.extra.papermod.icon %}<img src="{{ get_url(path=config.extra.papermod.icon) }}" alt="logo" aria-label="logo" height="30px">{%- endif %}
+                {{ config.extra.papermod.title }}
+            </a>
+        </div>
+        {% if config.extra.papermod.navigation %}
+        <ul id="menu">
+            {% for item in config.extra.papermod.navigation %}
+            {% set url = item.url | replace(from='$BASE_URL', to=config.base_url) %}
+            {% set is_active_link = current_url and url | trim_end_matches(pat="/") == current_url | trim_end_matches(pat="/") %}
+            <li>
+                <a href="{{ url }}" title="{{ item.title }}">
+                    <span{% if is_active_link %} class="active"{% endif %}>{{ item.title }}</span>
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </nav>
+</header>

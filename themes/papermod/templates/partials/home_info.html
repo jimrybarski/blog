@@ -1,0 +1,7 @@
+<article class="home-info">
+    <div class="entry-content">
+        {% block home_entry_content %}
+        {{ config.extra.papermod.home_content | markdown(inline=true) | safe }}
+        {% endblock %}
+    </div>
+</article>
