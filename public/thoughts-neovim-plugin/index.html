@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+<head>
+    
+    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Some initial thoughts on developing Lua plugins for Neovim</title>
+
+
+<meta name="keywords" content="">
+
+
+
+<meta name="description" content="">
+
+
+
+<meta name="author" content="Jim Rybarski">
+
+
+<link rel="canonical" href="https:&#x2F;&#x2F;www.rybarski.com&#x2F;thoughts-neovim-plugin&#x2F;">
+
+
+<link rel="stylesheet" href="https://www.rybarski.com/css/includes/scroll-bar.css">
+<link rel="stylesheet" href="https://www.rybarski.com/css/styles.css">
+<link rel="stylesheet" href="https://www.rybarski.com/css/override.css">
+
+
+
+
+
+<noscript>
+    
+</noscript>
+
+
+
+    
+</head>
+<body class="" id="top">
+    
+    
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    }
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https:&#x2F;&#x2F;www.rybarski.com" accesskey="h" title="Jim Rybarski (Alt + H)">
+                Jim Rybarski
+            </a>
+        </div>
+        
+        <ul id="menu">
+            
+            
+            
+            <li>
+                <a href="https:&#x2F;&#x2F;www.rybarski.com&#x2F;about" title="About">
+                    <span>About</span>
+                </a>
+            </li>
+            
+            
+            
+            <li>
+                <a href="https:&#x2F;&#x2F;www.rybarski.com&#x2F;tags" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            
+            
+            
+            <li>
+                <a href="https:&#x2F;&#x2F;www.rybarski.com&#x2F;atom.xml" title="RSS">
+                    <span>RSS</span>
+                </a>
+            </li>
+            
+            
+            
+            <li>
+                <a href="https:&#x2F;&#x2F;www.rybarski.com&#x2F;search" title="Search">
+                    <span>Search</span>
+                </a>
+            </li>
+            
+        </ul>
+        
+    </nav>
+</header>
+
+    
+    <main class="main">
+        
+<article class="post-single">
+  <header class="post-header">
+      <h1 class="post-title">Some initial thoughts on developing Lua plugins for Neovim</h1>
+      
+      
+      <div class="post-meta">
+      
+
+
+
+
+
+
+
+
+
+<span title="2025-01-11 00:00:00 +0000">2025-01-11</span>
+
+      
+      </div>
+      
+  </header>
+
+  
+
+  
+  <div class="post-content">
+      <p>I wrote a <a href="https://github.com/jimrybarski/bioinformatics.nvim">bioinformatics Neovim plugin</a> recently. It's nothing super special - it just provides some sequence manipulation functionality like generating or searching for a reverse complement, performing a pairwise alignment, etc. It really surprised me how often I found myself using it in day-to-day work right after I installed it.</p>
+<p>This was my first Lua codebase and it definitely left me underwhelmed with the language. I mean, it's fine - it's a very small language and you can get proficient pretty quickly. First-class functions are easy and it feels like you're being guided by the language towards using them. But overall, it just feels unpolished and I simply don't understand the <a href="https://nflatrea.bearblog.dev/lua-is-so-underrated/">enthusiasm</a> for it. Some issues I had:</p>
+<ul>
+<li>The only compound data type is a table (an associative array) that returns <code>nil</code> when unmapped keys are accessed. So more or less the same API as <code>defaultdict</code> in Python. This can make debugging a nightmare, as a typo in a field name where <code>nil</code> is an expected value makes it seem like the value just never gets set. Maybe this is less of a problem with experience, but it's a completely unforced error. Other languages simply don't have this problem because they have data types that make this error impossible.</li>
+<li>Variables are scoped globally by default, with opt-in local scoping. I just can't imagine a scenario where this is preferable.</li>
+<li>The lack of a built-in unit testing framework is disappointing. I had <a href="https://github.com/notomo/vusted/issues/23#issuecomment-2564888517">trouble</a> getting Vusted (a tool for unit testing Neovim plugins) installed because I didn't run the installer as root. What is the deal with modern language-specific package managers requiring root (thinking of the node ecosystem in particular here)? My only guess is that this is easier for people who don't understand how to set their shell's path and this is a strategy for not discouraging less-experienced programmers. But that sort of person is just copying-and-pasting anyway, and you can just do what Rustup does: add something to their .bashrc and print a little note about how they need to restart their terminal to be able to immediately use their new program.</li>
+<li>The <code>vim</code> object in Neovim plugins can't be accessed by an LSP, so you're unable to view or reference the internal Neovim API, and it just appears to the LSP like an undefined variable. It's possible to disable those lints on a per-variable basis, but this is still pretty suboptimal. There does seem to be <a href="https://www.reddit.com/r/neovim/comments/x3bd4i/how_can_i_get_lsp_to_recognize_builtin_neovim_api/">plugin</a> for this so maybe this is just growing pains.</li>
+<li>Unintuitive naming for built-in functions, like <code>#variable_name</code> to get the length of a string or <code>gsub()</code> to do replacement. What does that "g" stand for? It might be "global", but I haven't found a source for this that wasn't just speculation.</li>
+</ul>
+<p>That said, once you figure out the idioms and boilerplate, plugin development becomes super easy. The language provides so few abstractions that there's really only one way to do anything, which I appreciate.</p>
+
+  </div>
+  
+
+  <footer class="post-footer">
+      
+      <ul class="post-tags">
+          
+          
+          <li><a href="https:&#x2F;&#x2F;www.rybarski.com&#x2F;tags&#x2F;neovim&#x2F;">neovim</a></li>
+          
+      </ul>
+      
+
+    
+    
+
+
+<nav class="paginav">
+    
+    
+</nav>
+
+
+    
+    
+  </footer>
+
+</article>
+
+    </main>
+    
+    <footer class="footer">
+    
+    <span>© 2025 Jim Rybarski</span>
+    
+</footer>
+
+
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+
+
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+
+
+
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerText = 'copy';
+        function copyingDone() {
+            copybutton.innerText = 'copied!';
+            setTimeout(() => {
+                copybutton.innerText = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                var content = codeblock.textContent;
+                if(codeblock.firstChild.tagName == 'TABLE') {
+                    content = Array(...codeblock.firstChild.getElementsByTagName('span')).map((span) => { return span.textContent; }).join('');
+                }
+                navigator.clipboard.writeText(content);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            // td containing LineNos
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            // table containing LineNos and code
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            // code blocks not having highlight as parent class
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+
+
+<script src="https://www.rybarski.com/js/search.js"></script>
+<script src="https://www.rybarski.com/elasticlunr.min.js"></script>
+
+    
+</body>
+</html>

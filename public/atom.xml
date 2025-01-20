@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+    <title>Jim Rybarski</title>
+    <link rel="self" type="application/atom+xml" href="https://www.rybarski.com/atom.xml"/>
+    <link rel="alternate" type="text/html" href="https://www.rybarski.com"/>
+    <generator uri="https://www.getzola.org/">Zola</generator>
+    <updated>2025-01-19T00:00:00+00:00</updated>
+    <id>https://www.rybarski.com/atom.xml</id>
+    <entry xml:lang="en">
+        <title>My experience using mutation testing in production</title>
+        <published>2025-01-19T00:00:00+00:00</published>
+        <updated>2025-01-19T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Jim Rybarski
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://www.rybarski.com/mutation-testing/"/>
+        <id>https://www.rybarski.com/mutation-testing/</id>
+        
+        <content type="html" xml:base="https://www.rybarski.com/mutation-testing/">&lt;h3 id=&quot;what-is-mutation-testing&quot;&gt;What is mutation testing?&lt;a class=&quot;anchor&quot; aria-hidden=&quot;true&quot; href=&quot;#what-is-mutation-testing&quot; hidden=&quot;&quot;&gt;#&lt;&#x2F;a&gt;
+&lt;&#x2F;h3&gt;
+&lt;p&gt;Mutation testing is a technique for improving the correctness of your software, answering the question: do my unit tests actually cover every branch of my code? Mutation testing tools are external programs that make syntactically-legal alterations to your codebase, run your test suite (which is left unaltered), and check whether any of your tests fail. Effectively, it&#x27;s like deliberately adding bugs to your code in a systematic way and seeing if you&#x27;re already testing for those bugs (and, of course, reverting the bugs after testing is complete). For example, take this toy function:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;python&quot; style=&quot;background-color:#fdf6e3;color:#657b83;&quot; class=&quot;language-python &quot;&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span style=&quot;color:#859900;&quot;&gt;def &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b58900;&quot;&gt;filter_records&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#268bd2;&quot;&gt;records&lt;&#x2F;span&gt;&lt;span&gt;):
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#859900;&quot;&gt;for &lt;&#x2F;span&gt;&lt;span&gt;record &lt;&#x2F;span&gt;&lt;span style=&quot;color:#859900;&quot;&gt;in &lt;&#x2F;span&gt;&lt;span&gt;records:
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#859900;&quot;&gt;if &lt;&#x2F;span&gt;&lt;span&gt;record.quality &amp;lt; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#6c71c4;&quot;&gt;30&lt;&#x2F;span&gt;&lt;span&gt;:
+&lt;&#x2F;span&gt;&lt;span&gt;            &lt;&#x2F;span&gt;&lt;span style=&quot;color:#859900;&quot;&gt;continue
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#859900;&quot;&gt;yield &lt;&#x2F;span&gt;&lt;span&gt;record
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;The mutation testing library will flip the &lt;code&gt;&amp;lt;&lt;&#x2F;code&gt; to &lt;code&gt;&amp;gt;&lt;&#x2F;code&gt;, &lt;code&gt;yield record&lt;&#x2F;code&gt; to &lt;code&gt;yield None&lt;&#x2F;code&gt;, &lt;code&gt;30&lt;&#x2F;code&gt; to a bunch of different numbers, and so forth. It&#x27;s mostly limited to operators, strings, and constants, and the details vary by tool and language. Only one of these so-called mutants is tested at a time - while it would be possible to create multiple mutants for a single test run, practical experience shows that this doesn&#x27;t add much value, and the run time would explode exponentially.&lt;&#x2F;p&gt;
+&lt;p&gt;If none of your tests fail even after adding these &quot;bugs&quot;, it shows that your tests are incomplete - adding bugs should cause failing tests! Your job is then to either write more unit tests or refactor such that the things being mutated cease to exist. This is complementary to code coverage tools, which can only show whether a line was executed during the run of a test suite. It&#x27;s still possible - likely even - that you can have 100% line coverage while still missing some behavior. Take this example:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;python&quot; style=&quot;background-color:#fdf6e3;color:#657b83;&quot; class=&quot;language-python &quot;&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span style=&quot;color:#859900;&quot;&gt;if &lt;&#x2F;span&gt;&lt;span&gt;x &lt;&#x2F;span&gt;&lt;span style=&quot;color:#859900;&quot;&gt;and &lt;&#x2F;span&gt;&lt;span&gt;y:
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b58900;&quot;&gt;launch_rocket&lt;&#x2F;span&gt;&lt;span&gt;()
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#859900;&quot;&gt;if &lt;&#x2F;span&gt;&lt;span&gt;z:
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b58900;&quot;&gt;load_cargo_onto_rocket&lt;&#x2F;span&gt;&lt;span&gt;()
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Suppose you have one test where &lt;code&gt;x&lt;&#x2F;code&gt; and &lt;code&gt;y&lt;&#x2F;code&gt; evaluate to &lt;code&gt;True&lt;&#x2F;code&gt; but &lt;code&gt;z&lt;&#x2F;code&gt; is &lt;code&gt;False&lt;&#x2F;code&gt;, and another test where &lt;code&gt;x&lt;&#x2F;code&gt; or &lt;code&gt;y&lt;&#x2F;code&gt; is &lt;code&gt;False&lt;&#x2F;code&gt; and &lt;code&gt;z&lt;&#x2F;code&gt; is True. In one test, &lt;code&gt;launch_rocket()&lt;&#x2F;code&gt; will run, in the other, &lt;code&gt;load_cargo_onto_rocket()&lt;&#x2F;code&gt; will run, but you still haven&#x27;t exercised the scenario where &lt;code&gt;x&lt;&#x2F;code&gt;, &lt;code&gt;y&lt;&#x2F;code&gt;, and &lt;code&gt;z&lt;&#x2F;code&gt; are all &lt;code&gt;True&lt;&#x2F;code&gt;, which would reveal that this code is going to launch an empty rocket and then try to load cargo into a vehicle that is no longer there. A test coverage tool will correctly inform you that all four lines are tested, but the most critical behavior is ignored.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;my-experience-with-mutmut&quot;&gt;My experience with mutmut&lt;a class=&quot;anchor&quot; aria-hidden=&quot;true&quot; href=&quot;#my-experience-with-mutmut&quot; hidden=&quot;&quot;&gt;#&lt;&#x2F;a&gt;
+&lt;&#x2F;h3&gt;
+&lt;p&gt;I had a greenfield project at work and I decided it was a great opportunity to give mutation testing a whirl. This was for a Python application that, in broad terms, took raw sequencing data and determined the error rate of an enzyme. I looked at &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;sixty-north&#x2F;cosmic-ray&quot;&gt;Cosmic Ray&lt;&#x2F;a&gt;, &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;EvanKepner&#x2F;mutatest&quot;&gt;Mutatest&lt;&#x2F;a&gt;, and &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;boxed&#x2F;mutmut&quot;&gt;mutmut&lt;&#x2F;a&gt;. I ended up choosing mutmut as it just seemed the most polished at the time. I never did any rigorous comparison so I don&#x27;t want to endorse it over the others, but I was mostly pleased with it.&lt;&#x2F;p&gt;
+&lt;p&gt;Overall, I&#x27;m super happy with mutation testing, but not because it caught many bugs. In fact, I think it really only found 1 or 2 true positives, and they were relatively minor. The real benefit was that it deeply impacted the design of the codebase such that it was the most testable piece of software I&#x27;ve ever written. This happened because each time I added some new feature, I had to immediately consider whether I wanted to write dozens of unit tests to eliminate the mutants, or whether I wanted to refactor in a way that made it easier to test. Having a bunch of new mutants show up is often a sign of unnecessary complexity.&lt;&#x2F;p&gt;
+&lt;p&gt;Towards the end of the project, I had been thinking that it was probably not worth it to test the main entrypoint function in the tool as I&#x27;d need to essentially simulate an entire run of the application starting from raw sequencing data, but as I was so close I decided to spend a few hours writing it, and I&#x27;m glad I did. Having the entire codebase killing all its mutants not only gave me confidence that the code was correct, I could also fearlessly make changes.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;mutmut-has-a-few-flaws&quot;&gt;mutmut has a few flaws&lt;a class=&quot;anchor&quot; aria-hidden=&quot;true&quot; href=&quot;#mutmut-has-a-few-flaws&quot; hidden=&quot;&quot;&gt;#&lt;&#x2F;a&gt;
+&lt;&#x2F;h3&gt;
+&lt;p&gt;Some mutation testing tools do everything without altering the source on disk - the code is loaded, altered and tested in memory (which is apparently possible!). Because each mutant is independent of every other, this is embarrassingly parallelizable.  mutmut, on the other hand, writes each change to disk and then runs the test suite, one mutant at a time. This is certainly a much simpler design, but in addition to being slower, if you cancel the run partway through, the mutant that was being tested at the time will persist on disk! This isn&#x27;t an issue if you committed your source just before the run since it would make reverting it trivial, but I typically want to see if my tests pass before I commit, so I had to sift through all of the deliberate changes I had made in order to find a single-character alteration.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;advice-on-adopting-mutation-testing&quot;&gt;Advice on adopting mutation testing&lt;a class=&quot;anchor&quot; aria-hidden=&quot;true&quot; href=&quot;#advice-on-adopting-mutation-testing&quot; hidden=&quot;&quot;&gt;#&lt;&#x2F;a&gt;
+&lt;&#x2F;h3&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;Fast test suites are essential&lt;&#x2F;strong&gt;&lt;&#x2F;li&gt;
+&lt;&#x2F;ol&gt;
+&lt;p&gt;If you can run your entire test suite in one second, and you have 300 mutants to test, then adding mutmut to your workflow means it now takes five minutes to run your tests. There are a couple things you can do to optimize this, fortunately.&lt;&#x2F;p&gt;
+&lt;p&gt;First, the key is to observe that the vast majority of the time, mutants will in fact cause tests to fail, so you want to optimize for failing fast. If you have any property-based tests or slow-running tests in general, you can configure pytest to run them last by marking them as slow. Often, mutants will be killed by several different tests, so if you can kill them with fast tests, you can shave off meaningful amounts of time.&lt;&#x2F;p&gt;
+&lt;p&gt;Second, while a bit obvious, is to not run mutmut until you&#x27;re ready to commit, or only run in CI. Since it will identify a number of false positives in any new code, any time spent resolving those is wasted if you end up changing your design. I found that just running unit tests while developing, and then only running property-based and mutation tests once I thought I had something worthwhile ended up being a good compromise. The iteration time on finding out if I had architectural flaws was still fast enough that I never had to do any major refactors.&lt;&#x2F;p&gt;
+&lt;ol start=&quot;2&quot;&gt;
+&lt;li&gt;&lt;strong&gt;Start early&lt;&#x2F;strong&gt;&lt;&#x2F;li&gt;
+&lt;&#x2F;ol&gt;
+&lt;p&gt;After my initial success, I tried bolting on mutation testing to an existing project and it was a nightmare - there were hundreds of surviving mutants, and resolving them would require several refactors and just tons and tons of work that I simply couldn&#x27;t justify. Having the tool constrain the design from the start really is critical. It&#x27;s not impossible to adopt it later, but it does require a non-trivial investment.&lt;&#x2F;p&gt;
+&lt;ol start=&quot;3&quot;&gt;
+&lt;li&gt;&lt;strong&gt;Skip plotting functions and other &quot;untestable&quot; code, but here there be dragons&lt;&#x2F;strong&gt;&lt;&#x2F;li&gt;
+&lt;&#x2F;ol&gt;
+&lt;p&gt;mutmut works on an opt-in basis, so it will only modify files you explicitly tell it to. My tool generated a bunch of figures with matplotlib, which is not practically testable, and for those functions I just kept them in a separate module. I do have the habit of doing some light data wrangling in such code (e.g. something like getting all the values from a dictionary and plotting a histogram, instead of just passing in a list of values directly). Although it&#x27;s trivial, &quot;this can&#x27;t possibly be wrong&quot; is the thing that everyone writing a bug is telling themselves, so I tried to move as much of that code as possible to the modules where mutmut could evaluate them.&lt;&#x2F;p&gt;
+&lt;ol start=&quot;4&quot;&gt;
+&lt;li&gt;&lt;strong&gt;Mutation testing tools are still somewhat limited&lt;&#x2F;strong&gt;&lt;&#x2F;li&gt;
+&lt;&#x2F;ol&gt;
+&lt;p&gt;Only being able to modify operators, strings, and constants is powerful but doesn&#x27;t provide complete coverage. Notably lacking from all of the tools I looked at is the ability to alter method calls. For example, they can&#x27;t remove &lt;code&gt;.strip()&lt;&#x2F;code&gt; from a string variable, or swap &lt;code&gt;.is_upper()&lt;&#x2F;code&gt; with &lt;code&gt;.is_lower()&lt;&#x2F;code&gt;. To do so would require type inference, and the libraries for doing that in Python don&#x27;t seem like they could easily integrate with a mutation testing tool, if they would even work at all. I have high hopes for &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;astral-sh&#x2F;ruff&quot;&gt;Ruff&lt;&#x2F;a&gt;, which is implementing a &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;astral-sh&#x2F;ruff&#x2F;issues?q=state%3Aopen%20label%3A%22red-knot%22&quot;&gt;type inference engine&lt;&#x2F;a&gt;, and once that matures I think there would be a great opportunity to merge that into existing tools or to design one around it. Until then, it&#x27;s still a great technique, but it&#x27;s important to recognize this limitation.&lt;&#x2F;p&gt;
+&lt;ol start=&quot;5&quot;&gt;
+&lt;li&gt;&lt;strong&gt;Mutation testing won&#x27;t catch all bugs&lt;&#x2F;strong&gt;&lt;&#x2F;li&gt;
+&lt;&#x2F;ol&gt;
+&lt;p&gt;While the combination of unit tests, property-based tests and mutation tests did basically result in functions that were all correct (I mean, as far as I could tell), I still encountered a bug that was more strategic in error. In essence, I had told my tool to do the Wrong Thing, and then had tests that ensured the Wrong Thing was being done exactly as instructed. This kind of error will never be caught by any of these techniques, so we&#x27;ll always need a human or human-level intelligence to review the code and think critically about it.&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>Some initial thoughts on developing Lua plugins for Neovim</title>
+        <published>2025-01-11T00:00:00+00:00</published>
+        <updated>2025-01-11T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Jim Rybarski
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://www.rybarski.com/thoughts-neovim-plugin/"/>
+        <id>https://www.rybarski.com/thoughts-neovim-plugin/</id>
+        
+        <content type="html" xml:base="https://www.rybarski.com/thoughts-neovim-plugin/">&lt;p&gt;I wrote a &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;jimrybarski&#x2F;bioinformatics.nvim&quot;&gt;bioinformatics Neovim plugin&lt;&#x2F;a&gt; recently. It&#x27;s nothing super special - it just provides some sequence manipulation functionality like generating or searching for a reverse complement, performing a pairwise alignment, etc. It really surprised me how often I found myself using it in day-to-day work right after I installed it.&lt;&#x2F;p&gt;
+&lt;p&gt;This was my first Lua codebase and it definitely left me underwhelmed with the language. I mean, it&#x27;s fine - it&#x27;s a very small language and you can get proficient pretty quickly. First-class functions are easy and it feels like you&#x27;re being guided by the language towards using them. But overall, it just feels unpolished and I simply don&#x27;t understand the &lt;a href=&quot;https:&#x2F;&#x2F;nflatrea.bearblog.dev&#x2F;lua-is-so-underrated&#x2F;&quot;&gt;enthusiasm&lt;&#x2F;a&gt; for it. Some issues I had:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;The only compound data type is a table (an associative array) that returns &lt;code&gt;nil&lt;&#x2F;code&gt; when unmapped keys are accessed. So more or less the same API as &lt;code&gt;defaultdict&lt;&#x2F;code&gt; in Python. This can make debugging a nightmare, as a typo in a field name where &lt;code&gt;nil&lt;&#x2F;code&gt; is an expected value makes it seem like the value just never gets set. Maybe this is less of a problem with experience, but it&#x27;s a completely unforced error. Other languages simply don&#x27;t have this problem because they have data types that make this error impossible.&lt;&#x2F;li&gt;
+&lt;li&gt;Variables are scoped globally by default, with opt-in local scoping. I just can&#x27;t imagine a scenario where this is preferable.&lt;&#x2F;li&gt;
+&lt;li&gt;The lack of a built-in unit testing framework is disappointing. I had &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;notomo&#x2F;vusted&#x2F;issues&#x2F;23#issuecomment-2564888517&quot;&gt;trouble&lt;&#x2F;a&gt; getting Vusted (a tool for unit testing Neovim plugins) installed because I didn&#x27;t run the installer as root. What is the deal with modern language-specific package managers requiring root (thinking of the node ecosystem in particular here)? My only guess is that this is easier for people who don&#x27;t understand how to set their shell&#x27;s path and this is a strategy for not discouraging less-experienced programmers. But that sort of person is just copying-and-pasting anyway, and you can just do what Rustup does: add something to their .bashrc and print a little note about how they need to restart their terminal to be able to immediately use their new program.&lt;&#x2F;li&gt;
+&lt;li&gt;The &lt;code&gt;vim&lt;&#x2F;code&gt; object in Neovim plugins can&#x27;t be accessed by an LSP, so you&#x27;re unable to view or reference the internal Neovim API, and it just appears to the LSP like an undefined variable. It&#x27;s possible to disable those lints on a per-variable basis, but this is still pretty suboptimal. There does seem to be &lt;a href=&quot;https:&#x2F;&#x2F;www.reddit.com&#x2F;r&#x2F;neovim&#x2F;comments&#x2F;x3bd4i&#x2F;how_can_i_get_lsp_to_recognize_builtin_neovim_api&#x2F;&quot;&gt;plugin&lt;&#x2F;a&gt; for this so maybe this is just growing pains.&lt;&#x2F;li&gt;
+&lt;li&gt;Unintuitive naming for built-in functions, like &lt;code&gt;#variable_name&lt;&#x2F;code&gt; to get the length of a string or &lt;code&gt;gsub()&lt;&#x2F;code&gt; to do replacement. What does that &quot;g&quot; stand for? It might be &quot;global&quot;, but I haven&#x27;t found a source for this that wasn&#x27;t just speculation.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;That said, once you figure out the idioms and boilerplate, plugin development becomes super easy. The language provides so few abstractions that there&#x27;s really only one way to do anything, which I appreciate.&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>About</title>
+        <published>2024-12-31T00:00:00+00:00</published>
+        <updated>2024-12-31T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Jim Rybarski
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://www.rybarski.com/about/"/>
+        <id>https://www.rybarski.com/about/</id>
+        
+        <content type="html" xml:base="https://www.rybarski.com/about/">&lt;p&gt;I&#x27;m a computational biologist in the Boston area. My work has focused on the molecular biology of CRISPR systems, on- and off-target characterization, and metagenomic bioprospecting.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;jimrybarski&quot;&gt;Github&lt;&#x2F;a&gt;&lt;br &#x2F;&gt;
+&lt;a href=&quot;https:&#x2F;&#x2F;scholar.google.com&#x2F;citations?user=Vm_4NQQAAAAJ&amp;amp;hl=en&quot;&gt;Google Scholar&lt;&#x2F;a&gt;&lt;br &#x2F;&gt;
+&lt;a href=&quot;https:&#x2F;&#x2F;www.linkedin.com&#x2F;in&#x2F;jim-rybarski-890907201&#x2F;&quot;&gt;LinkedIn&lt;&#x2F;a&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;This site is generated by &lt;a href=&quot;https:&#x2F;&#x2F;www.getzola.org&#x2F;&quot;&gt;Zola&lt;&#x2F;a&gt; with a slightly modified &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;cydave&#x2F;zola-theme-papermod&quot;&gt;Papermod&lt;&#x2F;a&gt; theme.&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+</feed>
