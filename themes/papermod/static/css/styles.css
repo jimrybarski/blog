@@ -604,15 +604,16 @@ pre:hover .copy-code {
   padding: 4px 6px;
   font-size: 0.78em;
   line-height: 1.5;
-  background: var(--code-bg);
+  /* background: var(--code-bg); */
+  background: #fdf6e3;
   border-radius: 2px;
 }
 .post-content pre code {
   display: block;
   margin: auto 0;
   padding: 10px;
-  color: #d5d5d6;
-  background: var(--hljs-bg) !important;
+  /* color: #d5d5d6; */
+  /* background: var(--hljs-bg) !important; */
   border-radius: var(--radius);
   overflow-x: auto;
   word-break: break-all;

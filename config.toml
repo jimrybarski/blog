@@ -7,7 +7,6 @@ author = "Jim Rybarski"
 compile_sass = true
 feed_filenames = ["atom.xml", ]
 
-
 # Whether to build a search index to be used later on by a JavaScript library
 build_search_index = true
 
@@ -32,9 +31,9 @@ include_content = true
 # Accepted value "elasticlunr_javascript" or "elasticlunr_json"
 index_format = "elasticlunr_json"
 
-
 [markdown]
 highlight_code = true
+highlight_theme = "solarized-light"
 
 
 [extra]
