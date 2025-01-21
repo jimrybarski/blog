@@ -5,6 +5,8 @@ extra = { show_post_meta = false }
 +++
 I'm a computational biologist in the Boston area. My work has focused on the molecular biology of CRISPR systems, on- and off-target characterization, and metagenomic bioprospecting.  
   
+jim@rybarski.com  
+
 [Github](https://github.com/jimrybarski)  
 [Google Scholar](https://scholar.google.com/citations?user=Vm_4NQQAAAAJ&hl=en)  
 [LinkedIn](https://www.linkedin.com/in/jim-rybarski-890907201/)  
