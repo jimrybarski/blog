@@ -8,6 +8,10 @@
         <lastmod>2024-12-31</lastmod>
     </url>
     <url>
+        <loc>https://www.rybarski.com/arecibo/</loc>
+        <lastmod>2025-02-01</lastmod>
+    </url>
+    <url>
         <loc>https://www.rybarski.com/mutation-testing/</loc>
         <lastmod>2025-01-19</lastmod>
     </url>
@@ -21,6 +25,12 @@
         <loc>https://www.rybarski.com/tags/</loc>
     </url>
     <url>
+        <loc>https://www.rybarski.com/tags/biology/</loc>
+    </url>
+    <url>
+        <loc>https://www.rybarski.com/tags/fun/</loc>
+    </url>
+    <url>
         <loc>https://www.rybarski.com/tags/mutation-testing/</loc>
     </url>
     <url>
@@ -28,6 +38,9 @@
     </url>
     <url>
         <loc>https://www.rybarski.com/tags/programming/</loc>
+    </url>
+    <url>
+        <loc>https://www.rybarski.com/tags/rust/</loc>
     </url>
     <url>
         <loc>https://www.rybarski.com/tags/testing/</loc>
