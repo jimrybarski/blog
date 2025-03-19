@@ -12,6 +12,10 @@
         <lastmod>2025-02-01</lastmod>
     </url>
     <url>
+        <loc>https://www.rybarski.com/ds9/</loc>
+        <lastmod>1999-06-02</lastmod>
+    </url>
+    <url>
         <loc>https://www.rybarski.com/mutation-testing/</loc>
         <lastmod>2025-01-19</lastmod>
     </url>
@@ -44,6 +48,9 @@
     </url>
     <url>
         <loc>https://www.rybarski.com/tags/testing/</loc>
+    </url>
+    <url>
+        <loc>https://www.rybarski.com/tags/tv/</loc>
     </url>
     <url>
         <loc>https://www.rybarski.com/thoughts-neovim-plugin/</loc>
